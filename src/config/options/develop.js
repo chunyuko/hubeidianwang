@@ -40,30 +40,19 @@ export const fields = {
     placeholder: "请输入序号",
     tip: "数据显示顺序,自动生成,也可自定义",
   },
-  titleEn: { init: "", label: "名称框", placeholder: "请输入昵称", tip: "用户昵称" },
   videoPath: {
     init: "",
-    label: "视频路径",
+    label: "介绍页面视频",
     type: "upload",
-    decorator: {
-      rules: [
-        { required: true, message: "不能为空", trigger: "blur" },
-        { min: 1, max: 10, message: "1到10个字符", trigger: "blur" },
-      ],
-    },
-    tip: "视频文件(若上传错误请检查文件类型)",
+    accept: ".mp4",
+    tip: "若有ppt录屏优先添加至此处",
   },
   video1Path: {
     init: "",
-    label: "发展视频",
+    label: "详情页面视频",
     type: "upload",
-    decorator: {
-      rules: [
-        { required: true, message: "不能为空", trigger: "blur" },
-        { min: 1, max: 10, message: "1到10个字符", trigger: "blur" },
-      ],
-    },
-    tip: "视频文件(若上传错误请检查文件类型)",
+    accept: ".mp4",
+    tip: "视频文件(修改时请两个视频一个修改)",
   },
 };
 

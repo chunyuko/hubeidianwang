@@ -140,3 +140,100 @@ export const minItem = (arr, fn = (v) => v) => {
 export const minIndex = (arr, fn = (v) => v) => {
   return minItem(arr, fn, "min")[0];
 };
+
+export const getImg = (file) => {
+  return new Promise((resolve, reject) => {
+    let res = { type: file.type, size: file.size, name: file.name, uid: file.uid };
+    let reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function (evt) {
+      let replaceSrc = evt.target.result;
+      let imageObj = new Image();
+      imageObj.src = replaceSrc;
+      imageObj.onload = function () {
+        (res["width"] = imageObj.width), (res["height"] = imageObj.height);
+        imageObj = null;
+        resolve(res);
+      };
+    };
+  });
+};
+
+export const getVideo = (file) => {
+  return new Promise((resolve, reject) => {
+    let res = { type: file.type, size: file.size, name: file.name, uid: file.uid };
+    let videoUrl = URL.createObjectURL(file);
+    let videoObj = document.createElement("video");
+    videoObj.onloadedmetadata = function (evt) {
+      URL.revokeObjectURL(videoUrl);
+      (res["width"] = videoObj.videoWidth),
+        (res["height"] = videoObj.videoHeight),
+        (res["duration"] = videoObj.duration);
+      videoObj = null;
+      videoUrl = null;
+      resolve(res);
+    };
+    videoObj.src = videoUrl;
+    videoObj.load();
+  });
+};
+//获取promise的状态
+const PROMISE_STATE = {
+  PENDING: "pending",
+  FULFILLED: "fulfilled",
+  REJECTED: "rejected",
+};
+export const decidePromiseState = (promise) => {
+  const t = {};
+  return Promise.race([promise, t])
+    .then((v) => (v === t ? PROMISE_STATE.PENDING : PROMISE_STATE.FULFILLED))
+    .catch(() => PROMISE_STATE.REJECTED);
+};
+export const MakeQuerablePromise = (promise) => {
+  if (promise.isFulfilled) return promise;
+
+  var isPending = true;
+  var isRejected = false;
+  var isFulfilled = false;
+
+  var result = promise.then(
+    function (v) {
+      isFulfilled = true;
+      isPending = false;
+      return v;
+    },
+    function (e) {
+      isRejected = true;
+      isPending = false;
+    }
+  );
+  result.isFulfilled = function () {
+    return isFulfilled;
+  };
+  result.isPending = function () {
+    return isPending;
+  };
+  result.isRejected = function () {
+    return isRejected;
+  };
+  return result;
+};
+
+export const getAllVideo = (file) => {
+  return new Promise((resolve, reject) => {
+    let res = { type: file.type, size: file.size, name: file.name, uid: file.uid };
+    let videoUrl = URL.createObjectURL(file);
+    let videoObj = document.createElement("video");
+    videoObj.onloadedmetadata = function (evt) {
+      URL.revokeObjectURL(videoUrl);
+      (res["width"] = videoObj.videoWidth),
+        (res["height"] = videoObj.videoHeight),
+        (res["duration"] = videoObj.duration);
+      videoObj = null;
+      videoUrl = null;
+      resolve(res);
+    };
+    videoObj.src = videoUrl;
+    videoObj.load();
+  });
+};

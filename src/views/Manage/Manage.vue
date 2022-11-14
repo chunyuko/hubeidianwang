@@ -94,6 +94,11 @@
         <a-card style="width: 100%" :bordered="false" tabPosition="left" :loading="cardLoading">
           <a slot="extra" href="#">
             <a-tooltip>
+              <template slot="title">全选</template>
+              <a-checkbox @change="(e) => checkTotal(e)" :checked="totalSelect" />
+            </a-tooltip>
+            <a-divider type="vertical" />
+            <a-tooltip>
               <template slot="title">添加素材</template>
               <a-icon type="plus" @click="showContent()" style="font-size: 16px"></a-icon>
             </a-tooltip>
@@ -101,8 +106,8 @@
             <a-tooltip>
               <template slot="title">删除素材</template>
               <a-popconfirm title="是否删除选中数据？" ok-text="确定" cancel-text="取消" @confirm="delMedia">
-                <a-icon type="delete" style="font-size: 16px" v-if="!asking"></a-icon>
-                <a-icon type="loading" style="font-size: 16px" v-else></a-icon>
+                <a-icon type="delete" style="font-size: 16px; margin-right: 15px" v-if="!asking"></a-icon>
+                <a-icon type="loading" style="font-size: 16px; margin-right: 15px" v-else></a-icon>
               </a-popconfirm>
             </a-tooltip>
           </a>
@@ -168,6 +173,11 @@
         <a-drawer placement="right" :visible="view_more" @close="close_view_more" width="550">
           <a-card style="width: 100%" :bordered="false" tabPosition="left" :loading="cardLoading">
             <a slot="extra" href="#">
+              <a-tooltip>
+                <template slot="title">全选</template>
+                <a-checkbox @change="(e) => checkMoreTotal(e)" :checked="totalMoreSelect" />
+              </a-tooltip>
+              <a-divider type="vertical" />
               <a-tooltip>
                 <template slot="title">添加素材</template>
                 <a-icon type="plus" @click="showContent()" style="font-size: 16px"></a-icon>
@@ -243,6 +253,7 @@
 </template>
 
 <script>
+import { getImg, getVideo } from "@/core/utils";
 import { Ellipsis, HFormModal, HTable } from "@/libs/components";
 import { columns, parseFields } from "@/config/options/manage.js";
 import BreadCrumb from "@/views/Components/BreadCrumb";
@@ -284,6 +295,8 @@ export default {
       asking: false,
       view_next: false,
       destroy: true,
+      totalSelect: false,
+      totalMoreSelect: false,
       eleForm: {},
       initModel: Object.assign({}, models),
       grouped: [],
@@ -392,17 +405,101 @@ export default {
         okText: "确定",
       });
     },
+    limitMulVideo(vals, form, paths) {
+      let res = JSON.parse(localStorage.getItem("admin"));
+      let width = res.width;
+      let height = res.height;
+      let videos = paths.map((item) => {
+        return getVideo(vals.get(item))
+          .then((res) => {
+            return res;
+          })
+          .catch(() => {
+            return false;
+          });
+      });
+      console.log(videos);
+      return Promise.all(videos)
+        .then((res) => {
+          console.log("所有上传视频信息", res);
+          console.log("开始上传FormData数据合法性检查", vals);
+          let failList = [];
+          res.forEach((res) => {
+            if (res.width > width || res.height > height) {
+              failList.push(res);
+              console.log(failList);
+              this.$message.error(res.name + `像素需要在${width}*${height}内,请删除后再上传该视频`);
+            }
+          });
+          console.log(failList);
+          if (failList.length == 0) {
+            console.log("开始上传FormData数据", vals);
+            return this.sumbit(vals, form.type).then(() => {});
+          }
+        })
+        .catch(() => {
+          return this.sumbit(vals, form.type).then(() => {});
+        });
+    },
+    limitImage(vals, form) {
+      let res = JSON.parse(localStorage.getItem("admin"));
+      let width = res.width;
+      let height = res.height;
+      let images = getImg(vals.get("path")).then((res) => {
+        console.log(res.name, res.type, res.width, res.height, res.size);
+        return res;
+      });
+      return new Promise((resolve, reject) => resolve(images))
+        .then((res) => {
+          // console.log("所有上传视频信息", res);
+          // console.log("开始上传FormData数据合法性检查", vals);
+          let failList = [];
+          if (res.width > width || res.height > height) {
+            failList.push(res);
+            this.$message.error(res.name + `像素需要在${width}*${height}内,请删除后在上传该图片`);
+          }
+          if (failList.length == 0) {
+            console.log("开始上传FormData数据", vals);
+            return this.sumbit(vals, form.type).then(() => {});
+          }
+        })
+        .catch(() => {
+          return this.sumbit(vals, form.type).then(() => {});
+        });
+    },
     oked(vals, form) {
       if (this.view_next && !this.view_more) {
         vals.set("manageData", this.selRecord.id);
         console.log(">");
+        return this.sumbit(vals, form.type);
       } else if (this.view_more) {
         vals.set("ppt1Datas", this.moreRecord.id);
         console.log(">>>");
+        return this.limitImage(vals, form);
       } else {
         vals.set("tenDatas", localStorage.getItem("tenDatas"));
+        return this.limitMulVideo(vals, form, ["videoPath", "video1Path"]);
       }
-      return this.sumbit(vals, form.type);
+    },
+    checkTotal(e) {
+      this.totalSelect = this.totalSelect ? false : true;
+      if (this.totalSelect) {
+        this.dataNext[this.tabnextKey].forEach((item) => {
+          this.checkednextKeys.push(item.id);
+        });
+      } else if (!this.totalSelect) {
+        this.checkednextKeys = [];
+      }
+    },
+    checkMoreTotal(e) {
+      this.totalMoreSelect = this.totalMoreSelect ? false : true;
+      if (this.totalMoreSelect) {
+        this.dataMore[this.tabmoreKey].forEach((item) => {
+          this.checkedmoreKeys.push(item.id);
+        });
+      } else if (!this.totalMoreSelect) {
+        this.checkedmoreKeys = [];
+      }
     },
     checkRulemoreMedia(e, item, index) {
       const checkmoreIndex = this.checkedmoreKeys.indexOf(item.id);

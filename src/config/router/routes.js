@@ -74,19 +74,19 @@ const asyncMap = [
       {
         path: "/develop",
         name: "develop",
-        meta: { title: "十大安全", authority: ["admin", "user"], hide: true }, //菜单元信息
+        meta: { title: "发展管理", authority: ["admin", "user"], hide: true }, //菜单元信息
         component: () => import(/* webpackChunkName: "dashboard" */ "@/views/Develop/Develop.vue"),
       },
       {
         path: "/manage",
         name: "manage",
-        meta: { title: "十大安全", authority: ["admin", "user"], hide: true }, //菜单元信息
+        meta: { title: "管理", authority: ["admin", "user"], hide: true }, //菜单元信息
         component: () => import(/* webpackChunkName: "dashboard" */ "@/views/Manage/Manage.vue"),
       },
       {
         path: "/info",
         name: "info",
-        meta: { title: "十大安全", authority: ["admin", "user"], hide: true }, //菜单元信息
+        meta: { title: "安全信息管理", authority: ["admin", "user"], hide: true }, //菜单元信息
         component: () => import(/* webpackChunkName: "dashboard" */ "@/views/Info/Info.vue"),
       },
       {

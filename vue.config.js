@@ -12,7 +12,7 @@ module.exports = defineConfig({
     },
   },
   devServer: {
-    port:5000,
+    port:8000,
     proxy: {
       "/unite": { target: process.env.VUE_APP_UNITEURL, changeOrigin: true, pathRewrite: { "^/unite": "" } },
       "/statics": { target: process.env.VUE_APP_UNITEURL, changeOrigin: true },

@@ -11,6 +11,10 @@
         <a-icon type="down" />
       </a>
       <a-menu slot="overlay" @click="onClick">
+        <a-menu-item key="3">
+          <a-icon type="redo" />
+          转换数据
+        </a-menu-item>
         <a-menu-item key="1">
           <a-icon type="edit" />
           修改信息
@@ -19,6 +23,11 @@
           <a-icon type="logout" />
           退出
         </a-menu-item>
+        <a-menu-item key="4">
+          <a-icon type="upload" />
+          上传配置
+        </a-menu-item>
+
         <!-- <a-menu-item key="2">2nd menu item</a-menu-item>
         <a-menu-item key="3">3rd menu item</a-menu-item> -->
       </a-menu>
@@ -36,13 +45,50 @@
         </a-form-model-item>
       </a-form-model>
     </a-modal>
+    <!-- <a-modal
+      :visible="visible"
+      title="像素配置"
+      @ok="handleConfig"
+      okText="确认"
+      cancelText="取消"
+      @cancel="closevisible"
+    >
+      <a-form-model :model="form" ref="configForm" :label-col="labelCol" :wrapper-col="wrapperCol">
+       
+        <a-form-model-item label="视频像素宽">
+          <a-input v-model="form.vwidth" placeholder="请输入像素宽" />
+        </a-form-model-item>
+        <a-form-model-item label="视频像素高">
+          <a-input v-model="form.vheight" placeholder="请输入像素高" />
+        </a-form-model-item>
+        <a-form-model-item label="图片像素宽">
+          <a-input v-model="form.mwidth" placeholder="请输入像素宽" />
+        </a-form-model-item>
+        <a-form-model-item label="图片像素高">
+          <a-input v-model="form.mheight" placeholder="请输入像素高" />
+        </a-form-model-item>
+      </a-form-model>
+    </a-modal> -->
+    <PxConfig :form="form" :visible="visible" :handle="oked" @cancel="closevisible"></PxConfig>
   </div>
 </template>
 
 <script>
+import api from "@/libs/api";
+import PxConfig from "@/components/layouts/PxConfig.vue";
 export default {
+  components: {
+    PxConfig,
+  },
   data() {
     return {
+      form: {
+        isstart: "",
+        mheight: null,
+        mwidth: null,
+        vheight: null,
+        vwidth: null,
+      },
       loginUser: null,
       labelCol: {
         xs: { span: 24 },
@@ -53,8 +99,14 @@ export default {
         sm: { span: 18 },
       },
       pwdVisible: false,
+      disabled: true,
+      visible: false,
       addForm: { id: null },
       password: null,
+      select: [
+        { value: 1, label: "yes" },
+        { value: 2, label: "no" },
+      ],
       rules: {
         password: [
           { required: true, message: "请输入旧密码", trigger: "change" },
@@ -75,6 +127,14 @@ export default {
     this.loginUser = this.$store.getters.userInfo.nickname;
   },
   methods: {
+    // handleChange(value) {
+    //   if (value === 1) {
+    //     this.disabled = false;
+    //   } else this.disabled = true;
+    // },
+    oked() {
+      this.visible = false;
+    },
     onClick(e) {
       let { key } = e;
       if (key == 2) {
@@ -84,6 +144,15 @@ export default {
             this.$router.push("/user/login");
           }
         });
+      } else if (key == 3) {
+        api.toapi.list();
+      } else if (key == 4) {
+        let username = this.$store.getters.userInfo.name;
+        this.visible = true;
+        if (JSON.parse(localStorage.getItem(username))) {
+          this.form = JSON.parse(localStorage.getItem(username));
+          console.log(this.form);
+        }
       } else {
         this.addForm.id = this.$store.getters.userInfo.id;
         this.pwdVisible = true;
@@ -112,6 +181,9 @@ export default {
     },
     close(e) {
       this.pwdVisible = false;
+    },
+    closevisible(e) {
+      this.visible = false;
     },
   },
 };

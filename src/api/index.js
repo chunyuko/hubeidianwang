@@ -9,6 +9,7 @@ import * as develop from "@/config/urls/develop";
 import * as manage from "@/config/urls/manage";
 import * as ppt from "@/config/urls/ppt";
 import * as image from "@/config/urls/image";
+import * as toapi from "@/config/urls/toapi";
 initRequest({
   baseURL: env.baseURL,
   timeout: env.timeout,
@@ -24,6 +25,7 @@ signApi(info);
 signApi(manage);
 signApi(ppt);
 signApi(image);
+signApi(toapi);
 
 export default api;
 export { signApi };

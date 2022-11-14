@@ -12,18 +12,18 @@ export const columns = [
     dataIndex: "number",
   },
   {
-    title: "发展",
+    title: "发展篇",
     dataIndex: "develop",
     scopedSlots: { customRender: "develop" },
   },
   {
-    title: "管理",
+    title: "管理篇",
     dataIndex: "manage",
     scopedSlots: { customRender: "manage" },
   },
 
   {
-    title: "安全信息",
+    title: "安全篇",
     dataIndex: "info",
     scopedSlots: { customRender: "info" },
   },
@@ -54,51 +54,55 @@ export const fields = {
   titleEn: { init: "", label: "名称框", placeholder: "请输入昵称", tip: "用户昵称" },
   videoPath: {
     init: "",
-    label: "视频路径",
+    label: "概述视频",
     type: "upload",
+    accept: ".mp4",
     decorator: {
       rules: [
         { required: true, message: "不能为空", trigger: "blur" },
         { min: 1, max: 10, message: "1到10个字符", trigger: "blur" },
       ],
     },
-    tip: "视频文件(若上传错误请检查文件类型)",
+    tip: "视频文件(修改时请4个视频一起修改)",
   },
   developVideoPath: {
     init: "",
-    label: "发展视频",
+    label: "发展篇概述",
     type: "upload",
+    accept: ".mp4",
     decorator: {
       rules: [
         { required: true, message: "不能为空", trigger: "blur" },
         { min: 1, max: 10, message: "1到10个字符", trigger: "blur" },
       ],
     },
-    tip: "视频文件(若上传错误请检查文件类型)",
+    tip: "视频文件(修改时请4个视频一起修改)",
   },
   manageVideoPath: {
     init: "",
-    label: "管理视频",
+    label: "管理篇概述",
     type: "upload",
+    accept: ".mp4",
     decorator: {
       rules: [
         { required: true, message: "不能为空", trigger: "blur" },
         { min: 1, max: 10, message: "1到10个字符", trigger: "blur" },
       ],
     },
-    tip: "视频文件(若上传错误请检查文件类型)",
+    tip: "视频文件(修改时请4个视频一起修改)",
   },
   safeVideoPath: {
     init: "",
-    label: "安全视频",
+    label: "安全篇概述",
     type: "upload",
+    accept: ".mp4",
     decorator: {
       rules: [
         { required: true, message: "不能为空", trigger: "blur" },
         { min: 1, max: 10, message: "1到10个字符", trigger: "blur" },
       ],
     },
-    tip: "视频文件(若上传错误请检查文件类型)",
+    tip: "视频文件(修改时请4个视频一起修改)",
   },
 };
 

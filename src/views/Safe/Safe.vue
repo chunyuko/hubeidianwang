@@ -49,7 +49,7 @@
             <template>
               <a-tooltip>
                 <template slot="title">编辑</template>
-                <a-icon type="edit" @click="handleDevelop(record)" style="font-size: 16px"></a-icon>
+                <a-icon type="form" @click="handleDevelop(record)" style="font-size: 16px"></a-icon>
               </a-tooltip>
             </template>
           </span>
@@ -57,7 +57,7 @@
             <template>
               <a-tooltip>
                 <template slot="title">编辑</template>
-                <a-icon type="edit" @click="handleManage(record)" style="font-size: 16px"></a-icon>
+                <a-icon type="form" @click="handleManage(record)" style="font-size: 16px"></a-icon>
               </a-tooltip>
             </template>
           </span>
@@ -65,7 +65,7 @@
             <template>
               <a-tooltip>
                 <template slot="title">编辑</template>
-                <a-icon type="edit" @click="handleInfo(record)" style="font-size: 16px"></a-icon>
+                <a-icon type="form" @click="handleInfo(record)" style="font-size: 16px"></a-icon>
               </a-tooltip>
             </template>
           </span>
@@ -104,10 +104,16 @@
 </template>
 
 <script>
+import { getImg, getVideo, decidePromiseState, MakeQuerablePromise } from "@/core/utils";
 import { Ellipsis, HFormModal, HTable } from "@/libs/components";
 import { columns, parseFields } from "@/config/options/safe.js";
 import BreadCrumb from "@/views/Components/BreadCrumb";
 
+const PROMISE_STATE = {
+  PENDING: "pending",
+  FULFILLED: "fulfilled",
+  REJECTED: "rejected",
+};
 export default {
   provide() {
     return {
@@ -159,7 +165,10 @@ export default {
     };
   },
   created() {},
-  mounted() {},
+  mounted() {
+    // window.history.replaceState({ key: "11003.050" }, null, "?page=1");
+    // console.log(history);
+  },
   computed: {
     rowSelection() {
       return {
@@ -225,8 +234,55 @@ export default {
         okText: "确定",
       });
     },
+    //多行视频或图片传输
+    limitMulVideo(vals, form, paths, fnc) {
+      let [width, height] = this.getVideoPx("vwidth", "vheight");
+      if (!width || !height) {
+        return this.sumbit(vals, form.type).then(() => {});
+      }
+      let videos = paths.map((item) => {
+        return fnc(vals.get(item))
+          .then((res) => {
+            return res;
+          })
+          .catch(() => {
+            return false;
+          });
+      });
+      return Promise.all(videos)
+        .then((res) => {
+          let failList = [];
+          res.forEach((res) => {
+            if (res.width > width || res.height > height) {
+              failList.push(res);
+              this.$message.error(res.name + `像素需要在${width}*${height}内,请删除后再上传该视频`);
+            }
+          });
+          console.log(failList);
+          if (failList.length == 0) {
+            return this.sumbit(vals, form.type).then(() => {});
+          }
+        })
+        .catch(() => {
+          return this.sumbit(vals, form.type).then(() => {});
+        });
+    },
+    getVideoPx(w, h) {
+      if (this.$store.getters.userInfo.name) {
+        let username = this.$store.getters.userInfo.name;
+        let res = JSON.parse(localStorage.getItem(username));
+        let [width, height] = [res[w], res[h]];
+        return [width, height];
+      }
+    },
     oked(vals, form) {
-      return this.sumbit(vals, form.type);
+      return this.limitMulVideo(
+        vals,
+        form,
+        ["videoPath", "developVideoPath", "manageVideoPath", "safeVideoPath"],
+        getVideo
+      );
+      // return this.sumbit(vals, form.type);
     },
     handleCancel() {
       this.visible = false;

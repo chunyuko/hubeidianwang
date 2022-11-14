@@ -16,7 +16,7 @@
         <span
           style="font-style: italic; font-weight: 700; font-size: 28px; display: inline-block; vertical-align: bottom"
         >
-          HEROAGES
+          上海宝瓶创意
         </span>
         <span style="display: inline-block">&nbsp;后台管理系统</span>
       </p>
@@ -54,7 +54,7 @@
             </a-checkbox> -->
             <!-- <a class="login-form-down" @click="showDrawer">资源下载</a> -->
             <a-button type="primary" class="login-form-button" @click="login">登入</a-button>
-            <a-button type="default" class="login-form-button" @click="showDrawer">资源下载</a-button>
+            <!-- <a-button type="default" class="login-form-button" @click="showDrawer">资源下载</a-button> -->
           </a-form-item>
         </a-form>
       </a-card>
@@ -221,7 +221,7 @@ export default {
             //this.$loading.hide({ tip: "登入中" });
             if (res.success === true) {
               // this.$router.push("/hardware/electric");
-              this.$router.push("/right");
+              this.$router.push("/safe");
             } else {
               // this.$loading.hide({ tip: "登入失败" });
               let msg = res.msg ? res.msg : "登入失败！";

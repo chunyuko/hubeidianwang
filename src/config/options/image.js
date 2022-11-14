@@ -16,15 +16,16 @@ export const fields = {
   },
   path: {
     init: "",
-    label: "视频路径",
+    label: "图片上传",
     type: "upload",
+    accept: ".png,.jpg",
     decorator: {
       rules: [
         { required: true, message: "不能为空", trigger: "blur" },
         { min: 1, max: 10, message: "1到10个字符", trigger: "blur" },
       ],
     },
-    tip: "视频文件(若上传错误请检查文件类型)",
+    tip: "图片文件(若上传错误请检查文件类型)",
   },
 };
 
